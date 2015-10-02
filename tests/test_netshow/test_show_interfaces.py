@@ -17,6 +17,7 @@
 
 from collections import OrderedDict
 from asserts import assert_equals, mod_args_generator
+import netshowlib.linux.iface as linux_iface
 import netshow.linux.show_interfaces as showint
 import netshow.linux.print_bridge as print_bridge
 import netshow.linux.print_bond as print_bond
@@ -31,6 +32,26 @@ class TestShowInterfaces(object):
     def setup(self):
         results = {'l2': True}
         self.showint = showint.ShowInterfaces(results)
+
+    @mock.patch('netshowlib.linux.lldp.Lldp.run')
+    @mock.patch('netshowlib.linux.common.read_file_oneline')
+    @mock.patch('netshowlib.linux.iface.Iface.read_from_sys')
+    def test_append_details(self, mock_read_from_sys, mock_file_oneline,
+                            mock_lldp):
+        values1 = {'carrier': '1',
+                   'operstate': 'up',
+                   'speed': '1000',
+                   'ifalias': 'Blah',
+                   'mtu': '1000',
+                   'address': '00:11:22:33:44:55'}
+        iface = linux_iface.Iface('eth22')
+        piface = print_iface.PrintIface(iface)
+        mock_read_from_sys.side_effect = mod_args_generator(values1)
+        self.showint.show_mac = True
+        results = self.showint.cli_append_oneline(piface)
+        assert_equals(results, [['up', 'eth22 (Blah)',
+                                '00:11:22:33:44:55', '1G',
+                                '1000', 'unknown_int_type', '']])
 
     @mock.patch('netshowlib.linux.iface.portname_list')
     @mock.patch('netshow.linux.print_iface.linux_iface.Iface.exists')
@@ -237,10 +258,6 @@ class TestShowInterfaces(object):
         assert_equals(json.loads(
             self.showint.print_single_iface()).get('port_category'), 'bond')
 
-
-
-
-
     @mock.patch('netshow.linux.show_interfaces.ShowInterfaces.print_json_many_ifaces')
     @mock.patch('netshow.linux.show_interfaces.ShowInterfaces.print_cli_many_ifaces')
     def test_many_ifaces_cli_output(self, mock_cli_ifaces, mock_json_ifaces):
@@ -259,8 +276,6 @@ class TestShowInterfaces(object):
         _output = self.showint.print_many_ifaces()
         mock_json_ifaces.assert_called_with('l2')
         assert_equals(_output, 'json_output')
-
-
 
     @mock.patch('netshow.linux.print_iface.linux_iface.Iface.exists')
     @mock.patch('netshow.linux.show_interfaces.print_iface.linux_iface.Iface.read_from_sys')

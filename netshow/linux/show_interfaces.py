@@ -199,8 +199,8 @@ class ShowInterfaces(object):
         _table = []
         if self.show_mac:
             _table.append([piface.linkstate,
-                           piface.iface.mac,
                            piface.name,
+                           piface.iface.mac,
                            piface.speed,
                            piface.iface.mtu,
                            piface.port_category,
