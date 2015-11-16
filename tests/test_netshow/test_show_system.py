@@ -18,9 +18,24 @@
 from asserts import assert_equals
 import netshow.linux.show_system as show_system
 import mock
+import io
 import json
-import re
 
 
 class TestShowSystem(object):
-    pass
+
+    @mock.patch('netshowlib.linux.system_summary.common.exec_command')
+    def test_show_system_run_json_output(self, mock_command):
+        mock_output = io.open('tests/test_netshow/lsb_release.txt').read()
+        mock_command.return_value = mock_output
+        test_system = show_system.ShowSystem({'--json': ''})
+        test_system.use_json = True
+        output = test_system.run()
+        osname = json.loads(output).get('system_dict').get('os_name')
+        assert_equals(osname, 'Debian')
+
+#    def test_show_system_run_no_json():
+#        test_system = show_system.SystemSummary()
+#        test_system.use_json = False
+#        output = test_system.run()
+#        assert_equals('', output)
