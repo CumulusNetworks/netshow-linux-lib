@@ -39,7 +39,7 @@ echo "Go into temp install directory"
 cd .temp
 
 echo "Install netshow-core repo"
-git clone -b $GIT_BRANCH ssh://git@github.com/CumulusNetworks/netshow-core.git netshow-core
+git clone -b $GIT_BRANCH https://github.com/CumulusNetworks/netshow-core.git netshow-core
 
 echo " Install netshow-core-lib"
 cd netshow-core/netshow-lib
