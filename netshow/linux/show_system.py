@@ -21,11 +21,11 @@ class ShowSystem(object):
         """
         :return: output regarding system like OS type, etc
         """
+        self.system.run()
         if self.use_json:
             return json.dumps(self,
                               cls=NetEncoder, indent=4)
         else:
-            self.system.run()
             return self.cli_output()
 
     def cli_output(self):
