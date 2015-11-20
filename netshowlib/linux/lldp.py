@@ -39,6 +39,7 @@ def cacheinfo():
         lldpobj['adj_port'] = _interface.findtext('port/id')
         lldpobj['adj_hostname'] = _interface.findtext('chassis/name')
         lldpobj['adj_mgmt_ip'] = _interface.findtext('chassis/mgmt-ip')
+        lldpobj['system_descr'] = _interface.findtext('chassis/descr')
         if not lldp_hash.get(local_port):
             lldp_hash[local_port] = []
         lldp_hash[local_port].append(lldpobj)
