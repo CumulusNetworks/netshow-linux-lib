@@ -28,7 +28,8 @@ def test_cacheinfo(mock_lldp):
     assert_equals(lldp_hash.get('eth2')[0],
                   {'adj_hostname': 'right',
                    'adj_port': 'swp2',
-                   'adj_mgmt_ip': '192.168.0.15'})
+                   'adj_mgmt_ip': '192.168.0.15',
+                   'system_descr': 'Cumulus Linux'})
 
 
 @mock.patch('netshowlib.linux.lldp.common.exec_command')
@@ -44,5 +45,8 @@ def test_using_lldp_obj(mock_lldp):
     lldp_out = open('tests/test_netshowlib/lldp_output.txt').read()
     mock_lldp.return_value = lldp_out
     _output = linux_lldp.Lldp('eth2').run()
-    assert_equals(_output, [{'adj_hostname': 'right', 'adj_port': 'swp2', 'adj_mgmt_ip': '192.168.0.15'}])
+    assert_equals(_output, [{'adj_hostname': 'right',
+                             'adj_port': 'swp2',
+                             'adj_mgmt_ip': '192.168.0.15',
+                             'system_descr': 'Cumulus Linux'}])
 
