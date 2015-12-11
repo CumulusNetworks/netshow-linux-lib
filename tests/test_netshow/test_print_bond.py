@@ -20,6 +20,8 @@ import netshowlib.linux.bond as linux_bond
 import mock
 from asserts import assert_equals, mod_args_generator
 import re
+import json
+from netshow.linux.netjson_encoder import NetEncoder
 
 
 class TestPrintBondMember(object):
@@ -227,6 +229,29 @@ class TestPrintBond(object):
         assert_equals(self.piface.abbrev_bondstate(bondmem), 'P')
         bondmem._bondstate = 0
         assert_equals(self.piface.abbrev_bondstate(bondmem), 'N')
+
+    @mock.patch('netshowlib.linux.common.read_file_oneline')
+    @mock.patch('netshowlib.linux.iface.Iface.read_from_sys')
+    def test_print_bond_json(self, mock_read_from_sys, mock_file_oneline):
+        values = {'bonding/slaves': 'eth22 eth24',
+                  'carrier': '1',
+                  'operstate': 'up',
+                  'bonding/mode': 'active-backup 2',
+                  'bonding/xmit_hash_policy': 'layer3+4 1',
+                  'ifalias': '',
+                  'speed': '1000',
+                  'address': '11:22',
+                  'bonding/min_links': '1',
+                  'mtu': '1000'}
+
+        values2 = {}
+        mock_read_from_sys.side_effect = mod_args_generator(values)
+        mock_file_oneline.side_effect = mod_args_generator(values2)
+        output = json.loads(json.dumps(self.piface, cls=NetEncoder, indent=4))
+        assert_equals(sorted(list(output.get('iface_obj').get('members').keys())),
+                      [u'eth22', u'eth24'])
+        assert_equals(output.get('iface_obj').
+                      get('members').get('eth22').get('bondstate'), 1)
 
     @mock.patch('netshowlib.linux.common.read_file_oneline')
     @mock.patch('netshowlib.linux.iface.Iface.read_from_sys')
