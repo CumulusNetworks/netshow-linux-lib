@@ -246,6 +246,9 @@ class BondMember(linux_iface.Iface):
         parse /proc/net/bonding to get link failure and agg_id info
         """
         # open proc/net/bonding
+        if not self.master:
+            return
+
         bondfile = "%s/%s" % (self.bondfileloc, self.master.name)
         try:
             result = io.open(bondfile).read()
@@ -286,10 +289,11 @@ class BondMember(linux_iface.Iface):
         :return: pointer to  :class:`Bond<netshowlib.linux.bond.Bond>` instance that \
         this interface belongs to
         """
-        if not self._master:
-            bondname = self.read_symlink('master')
-            self._master = self.bond_class(bondname)
-        return self._master
+        if hasattr(self, '_master'):
+            if not self._master:
+                bondname = self.read_symlink('master')
+                self._master = self.bond_class(bondname)
+            return self._master
 
     @property
     def bondstate(self):
@@ -297,7 +301,7 @@ class BondMember(linux_iface.Iface):
         :return: state of interface in the bond. can be 0(inactive) or 1(active)
         """
         # if LACP check /proc/net/bonding for agg matching state
-        if self.master.mode == '4':
+        if self.master and self.master.mode == '4':
             self._parse_proc_net_bonding()
         else:
             self._bondstate = 1 if self.linkstate == 2 else 0

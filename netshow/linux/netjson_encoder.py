@@ -24,7 +24,14 @@ class NetEncoder(JSONEncoder):
         if hasattr(obj, 'state'):
             _hash['state'] = obj.state.keys()
         if hasattr(obj, 'members'):
-            _hash['members'] = obj.members.keys()
+        #    _hash['members'] = obj.members.keys()
+             _hash['members'] = {}
+             for (_k, _v) in obj.members.items():
+                if hasattr(_v, '_master'):
+                    _v.__dict__.pop('_master')
+                if hasattr(_v, 'bond_class'):
+                    _v.__dict__.pop('bond_class')
+                _hash['members'][_k] = _v
         if hasattr(obj, 'iface'):
             _hash['iface_obj'] = obj.iface
         if hasattr(obj, 'system'):
