@@ -101,7 +101,7 @@ class PrintBond(PrintIface):
         """
         _arr = []
         _arr.append(self.print_bondmems())
-        _arr.append(self.ip_info())
+        _arr += PrintIface.summary.fget(self)
         if self.iface.is_trunk():
             _arr += self.trunk_summary()
         elif self.iface.is_access():

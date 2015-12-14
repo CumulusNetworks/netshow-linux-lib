@@ -20,21 +20,21 @@ import netshowlib.linux.iface as linux_iface
 import netshowlib.linux.bridge as linux_bridge
 import mock
 from asserts import assert_equals, mod_args_generator
-from nose.tools import assert_not_equal
+
 
 class TestPrintIface(object):
     def setup(self):
         iface = linux_iface.Iface('eth22')
         self.piface = print_iface.PrintIface(iface)
 
-    def test_print_portlist_in_chunks(self):
+    def test_print_list_in_chunks(self):
         portlist = ['eth1.20', 'eth2.20', 'eth3.20', 'eth4.20',
                     'eth13.50', 'eth17.50', 'eth20.50', 'eth21.50',
                     'eth30', 'eth40', 'eth44', 'eth55', 'eth60',
                     'eth70', 'eth80', 'eth90', 'eth100']
         title = 'untagged members'
         strlist = []
-        self.piface.print_portlist_in_chunks(portlist, title, strlist)
+        self.piface.print_list_in_chunks(portlist, title, strlist)
         assert_equals(strlist,  ['untagged members: eth1-4.20, eth100, eth13.50, eth17.50',
                                  '    eth20-21.50, eth30, eth40, eth44',
                                  '    eth55, eth60, eth70, eth80',
@@ -166,15 +166,21 @@ class TestPrintIface(object):
         assert_equals(_output, '')
         # if l3, print ip details
         mock_is_l3.return_value = True
-        self.piface.iface.ip_address.ipv4 = ['10.1.1.1/24']
+        self.piface.iface.ip_address.ipv4 = ['10.1.1.1/32', '10.1.1.2/32',
+                                             '10.1.1.3/32', '10.1.1.4/32',
+                                             '10.1.1.5/32']
         self.piface.iface.ip_neighbor._all_neighbors = {
             '10.1.1.2': '222',
             '10.1.1.3': '333'}
         _output = self.piface.ip_details()
         _outputtable = _output.split('\n')
         assert_equals(_outputtable[0], 'ip_details')
-        assert_equals(_outputtable[2].split(), ['ip:', '10.1.1.1/24'])
-        assert_equals(_outputtable[3].split(), ['arp_entries:', '2'])
+        assert_equals(_outputtable[2].split(),
+                      ['ip:', '10.1.1.1/32,', '10.1.1.2/32,',
+                       '10.1.1.3/32,', '10.1.1.4/32'])
+        assert_equals(_outputtable[3].split(),
+                      ['10.1.1.5/32'])
+        assert_equals(_outputtable[4].split(), ['arp_entries:', '2'])
 
     @mock.patch('netshowlib.linux.lldp.Lldp.run')
     def test_lldp_details(self, mock_lldp):

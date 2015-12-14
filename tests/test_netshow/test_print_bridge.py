@@ -216,14 +216,16 @@ class TestPrintBridge(object):
     def test_summary(self, mock_is_l3, mock_vlan_id, mock_tagged, mock_untagged,
                      mock_stp_summary):
         mock_is_l3.return_value = True
-        self.piface.iface.ip_address.ipv4 = ['10.1.1.1/24']
+        self.piface.iface.ip_address.ipv4 = ['10.1.1.1/32', '10.1.1.2/32', '10.1.1.3/32', '10.1.1.4/32',
+                                             '10.1.1.5/32', '10.1.1.6/32', '10.1.1.7/32']
         mock_vlan_id.return_value = 'vlan_id'
         mock_stp_summary.return_value = 'stp_summary'
         mock_tagged.return_value = ['tagged_ifaces']
         mock_untagged.return_value = ['untagged_ifaces']
         _output = self.piface.summary
         assert_equals(_output,
-                      ['ip: 10.1.1.1/24',
+                      ['ip: 10.1.1.1/32, 10.1.1.2/32, 10.1.1.3/32, 10.1.1.4/32',
+                       '    10.1.1.5/32, 10.1.1.6/32, 10.1.1.7/32',
                        '802.1q_tag: vlan_id', 'stp_summary',
                        'untagged_ifaces',
                        'tagged_ifaces',
