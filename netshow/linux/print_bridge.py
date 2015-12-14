@@ -78,7 +78,7 @@ class PrintBridge(PrintIface):
         _untagmems = self.iface.untagged_members.keys()
         if _untagmems:
             _str = []
-            self.print_portlist_in_chunks(_untagmems, _('untagged_members'), _str)
+            self.print_list_in_chunks(_untagmems, _('untagged_members'), _str)
             return _str
         return []
 
@@ -89,7 +89,7 @@ class PrintBridge(PrintIface):
         _tagmems = self.iface.tagged_members.keys()
         if _tagmems:
             _str = []
-            self.print_portlist_in_chunks(_tagmems, _('tagged_members'), _str)
+            self.print_list_in_chunks(_tagmems, _('tagged_members'), _str)
             return _str
         return []
 
@@ -168,7 +168,7 @@ class PrintBridge(PrintIface):
         _table = []
         memberlist = self.iface.members.keys()
         _table2 = []
-        self.print_portlist_in_chunks(memberlist, '', _table2)
+        self.print_list_in_chunks(memberlist, '', _table2)
         _table.append([_('bridge_members') + ':',  _table2[0]])
         for i in range(1, len(_table2)):
             _table.append(['', _table2[i]])
@@ -184,7 +184,7 @@ class PrintBridge(PrintIface):
                      self.iface.stp.member_state.get(statename)]
         if _portlist:
             _table2 = []
-            self.print_portlist_in_chunks(_portlist, '', _table2)
+            self.print_list_in_chunks(_portlist, '', _table2)
             for i in _table2:
                 _table.append([i])
             return tabulate(_table, _header) + self.new_line()

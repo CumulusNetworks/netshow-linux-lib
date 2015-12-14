@@ -109,22 +109,22 @@ class PrintIface(object):
         return _str
 
     def ip_info(self):
+        _arr = []
         if self.iface.is_l3():
-            _str2 = ""
             if self.iface.ip_addr_assign == 1:
-                _str2 = "(%s)" % _('dhcp')
-
-            _str = _('ip') + ': ' + \
-                ', '.join(self.iface.ip_address.allentries) + _str2
-            return _str
-        return ''
+                first_addr = self.iface.ip_address.allentries[0]
+                _arr.append("%s(%s)" % (first_addr, _('dhcp')))
+            else:
+                self.print_portlist_in_chunks(self.iface.ip_address.allentries,
+                                              _('ip'), _arr)
+        return _arr
 
     @property
     def summary(self):
         """
         :return: summary information regarding the interface
         """
-        return [self.ip_info()]
+        return self.ip_info()
 
     def cli_header(self):
         """
@@ -145,10 +145,13 @@ class PrintIface(object):
 
     def cli_output(self, show_legend=False):
         """
-        :params: show_legend. if set to to true, will show legend, otherwise will show just one line. message
-        telling user to run "netshow" with -l option
         Each PrintIface child should define their own  of this function
-        :return: output for 'netshow interface <ifacename>'
+        Args:
+            show_legend:  if set to to true, will show legend,
+                        otherwise will show just one line. message
+                        telling user to run "netshow" with -l option
+        Returns:
+            output for 'netshow interface <ifacename>'
         """
         _str = one_line_legend(show_legend)
         _str += self.cli_header()
@@ -166,8 +169,8 @@ class PrintIface(object):
         if not self.iface.is_l3():
             return ''
         else:
-            _table.append(["%s:" % (_('ip')),
-                           ', '.join(self.iface.ip_address.allentries)])
+            self.print_list_in_chunks(self.iface.ip_address.allentries,
+                                      _('ip'), _table, place_in_array=True)
             _table.append(["%s:" % (_('arp_entries')),
                            len(self.iface.ip_neighbor.allentries)])
 
@@ -207,27 +210,54 @@ class PrintIface(object):
             else:
                 native_bridges.append(_bridgename)
         _strlist = [_('bridge_membership') + ':']
-        self.print_portlist_in_chunks(tagged_bridges, _('tagged'), _strlist)
-        self.print_portlist_in_chunks(native_bridges, _('untagged'), _strlist)
+        self.print_list_in_chunks(tagged_bridges, _('tagged'), _strlist)
+        self.print_list_in_chunks(native_bridges, _('untagged'), _strlist)
 
         return _strlist
 
-    def print_portlist_in_chunks(self, portlist, _title, _strlist, shorten_to=4):
+    def print_list_in_chunks(self, listofstuff, _title, _result,
+                             place_in_list=False, shorten_to=4):
         """
         take a long  array of bridge names and break it up into smaller groups of
         arrays based on shorten_to variable
         Reference: http://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks-in-python
-        """
-        if portlist:
-            portlist = sorted(common.group_ports(portlist))
-            portlist = [portlist[_x:_x+shorten_to]
-                        for _x in range(0, len(portlist), shorten_to)]
-            for _idx, _arrlist in enumerate(portlist):
+        Args:
+            listofstuff (list):  list of things that in are in a long list
+                                 that you want to break up into chunks
+            _title (str): heading of the list of stuff you want cut up in chunks
+            _result (list): The list where the chunks will be stored.
+            place_in_list (boolean): Some data needs to be returned as a
+                                    list in a list. Others do not.
+                                     Setting to this true means that you
+                                     want the _result returned to be a list of list
+                                     Default: False
+            shorten_to (int): How many elements are to be placed in each chunk.
+                              Default: 4
+                """
+        if listofstuff:
+            listofstuff = sorted(common.group_ports(listofstuff))
+            listofstuff = [listofstuff[_x:_x+shorten_to]
+                           for _x in range(0, len(listofstuff), shorten_to)]
+            for _idx, _arrlist in enumerate(listofstuff):
                 joined_arrlist = ', '.join(_arrlist)
                 if _idx == 0 and _title:
-                    _strlist.append(_title + ': ' + joined_arrlist)
+                    entry = _title + ': ' + joined_arrlist
+
+                    if place_in_list:
+                        arr_entry = [entry]
+                    else:
+                        arr_entry = entry
+
+                    _result.append(arr_entry)
                 else:
-                    _strlist.append('    ' + joined_arrlist)
+                    entry = '    ' + joined_arrlist
+
+                    if place_in_list:
+                        arr_entry = [entry]
+                    else:
+                        arr_entry = entry
+
+                    _result.append(arr_entry)
 
     def access_summary(self):
         """
