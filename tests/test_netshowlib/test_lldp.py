@@ -11,12 +11,20 @@ import netshowlib.linux.lldp as linux_lldp
 import xml.etree.ElementTree as ET
 import mock
 from asserts import assert_equals
-from nose.tools import set_trace
+
+
+@mock.patch('netshowlib.linux.lldp.os.path.exists')
+def test_when_lldp_daemon_is_not_running(mock_lldp_running):
+    mock_lldp_running.return_value = False
+    lldp_hash = linux_lldp.cacheinfo()
+    assert_equals(lldp_hash, {})
 
 
 # test lldp info for many interfaces
+@mock.patch('netshowlib.linux.lldp.os.path.exists')
 @mock.patch('netshowlib.linux.lldp._exec_lldp')
-def test_cacheinfo(mock_lldp):
+def test_cacheinfo(mock_lldp, mock_lldp_running):
+    mock_lldp_running.return_value = True
     lldp_out = open('tests/test_netshowlib/lldp_output.txt').read()
     mock_lldp.return_value = ET.fromstring(lldp_out)
     lldp_hash = linux_lldp.cacheinfo()
@@ -49,4 +57,3 @@ def test_using_lldp_obj(mock_lldp):
                              'adj_port': 'swp2',
                              'adj_mgmt_ip': '192.168.0.15',
                              'system_descr': 'Cumulus Linux'}])
-
