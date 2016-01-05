@@ -48,8 +48,10 @@ def test_get_running_exec_lldp(mock_lldp):
     mock_lldp.assert_called_with('/usr/sbin/lldpctl -f xml')
 
 
+@mock.patch('netshowlib.linux.lldp.os.path.exists')
 @mock.patch('netshowlib.linux.lldp.common.exec_command')
-def test_using_lldp_obj(mock_lldp):
+def test_using_lldp_obj(mock_lldp, mock_exists):
+    mock_exists.return_value = True
     lldp_out = open('tests/test_netshowlib/lldp_output.txt').read()
     mock_lldp.return_value = lldp_out
     _output = linux_lldp.Lldp('eth2').run()

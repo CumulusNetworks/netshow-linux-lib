@@ -85,8 +85,10 @@ class TestLinuxIface(object):
         mock_path_exists.return_value = False
         assert_equals(self.iface.exists(), False)
 
+    @mock.patch('netshowlib.linux.lldp.os.path.exists')
     @mock.patch('netshowlib.linux.lldp._exec_lldp')
-    def test_lldp(self, mock_lldp):
+    def test_lldp(self, mock_lldp, mock_exists):
+        mock_exists.return_value = True
         lldp_out = open('tests/test_netshowlib/lldp_output.txt').read()
         mock_lldp.return_value = ET.fromstring(lldp_out)
         self.iface = linux_iface.Iface('eth1')
