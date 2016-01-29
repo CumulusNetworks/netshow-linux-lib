@@ -34,15 +34,18 @@ class TestPrintBondMember(object):
         assert_equals(self.piface.port_category, 'bondmem')
 
     @mock.patch('netshowlib.linux.common.read_file_oneline')
-    @mock.patch('netshowlib.linux.iface.Iface.read_from_sys')
+    @mock.patch('netshowlib.linux.common.read_from_sys')
     def test_summary(self, mock_read_from_sys, mock_file_oneline):
-        values1 = {'carrier': '1', 'operstate': 'up',
-                   'operstate': 'up',
-                   'bonding/mode': 'something 2'}
+        values1 = {('carrier', 'bond0', True): '0',
+                   ('carrier', 'eth22', True): '1',
+                   ('operstate', 'bond0', True): 'down',
+                   ('operstate', 'eth22', True): 'up',
+                   ('bonding/mode', 'bond0', True): 'something 1'
+                   }
         values2 = {}
         mock_read_from_sys.side_effect = mod_args_generator(values1)
         mock_file_oneline.side_effect = mod_args_generator(values2)
-        assert_equals(self.piface.summary, ['master: bond0(UP)'])
+        assert_equals(self.piface.summary, ['master: bond0(DP)'])
 
     @mock.patch('netshowlib.linux.lldp.Lldp.run')
     @mock.patch('netshowlib.linux.common.read_file_oneline')
