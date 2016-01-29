@@ -6,7 +6,7 @@ from a linux device using the ``lldpctl`` command
 from netshowlib.linux import common
 import xml.etree.ElementTree as ElementTree
 from collections import OrderedDict
-
+import os
 
 def _exec_lldp(ifacename=None):
     """
@@ -26,12 +26,15 @@ def _exec_lldp(ifacename=None):
 
 def cacheinfo():
     """
-    Cacheinfo function for LLDP information
+    Cacheinfo function for LLDP information.
+    Only works for Debian based systems that default to using lldpd.
+    Or Redhat based systems that user has installed lldpd.
+    No current support for lldpad (redhat recommended lldp app)
     :return: hash of :class:`linux.lldp<Lldp>` objects with interface name as their keys
     """
     lldp_hash = OrderedDict()
     lldp_element = _exec_lldp()
-    if lldp_element is None:
+    if lldp_element is None or not os.path.exists('/var/run/lldpd.socket'):
         return lldp_hash
     for _interface in lldp_element.iter('interface'):
         local_port = _interface.get('name')
