@@ -29,7 +29,9 @@ def mock_open_str():
 
 
 def mod_args_generator(values, *args):
-    def mod_args(args):
+    def mod_args(*args):
+        if len(args) == 1:
+            return values[args[0]]
         return values[args]
     return mod_args
 
