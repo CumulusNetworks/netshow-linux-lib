@@ -25,6 +25,7 @@ class TestLinuxBondMember(object):
     def test_showing_master(self):
         assert_equals(self.iface.master, self.bond)
 
+
     @mock.patch('netshowlib.linux.iface.Iface.read_from_sys')
     def test_bondstate(self, mock_read_from_sys):
         values = {'carrier': '0', 'operstate': 'down',

@@ -26,7 +26,7 @@ class PrintBondMember(PrintIface):
         _arr = []
         _arr.append("%s: %s(%s%s)" % (_('master'),
                                       self.iface.master.name,
-                                      PrintIface.abbrev_linksummary(self.iface),
+                                      PrintIface.abbrev_linksummary(self.iface.master),
                                       PrintBond.abbrev_bondstate(self.iface)))
         return _arr
 
