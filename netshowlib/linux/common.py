@@ -22,6 +22,18 @@ class ExecCommandException(Exception):
 SYS_PATH_ROOT = '/sys/class/net'
 
 
+def portname_list():
+    """
+    :return: list of interface names from /sys/class/net
+    """
+    ifacenames = os.listdir(SYS_PATH_ROOT)
+    for ifacename in ifacenames:
+        if not os.path.islink(os.path.join(SYS_PATH_ROOT,
+                                           ifacename)):
+            ifacenames.remove(ifacename)
+    return ifacenames
+
+
 def sys_path(attr, iface_name):
     """
     :params attr: attribute under /sys/class/net/:meth:`name`

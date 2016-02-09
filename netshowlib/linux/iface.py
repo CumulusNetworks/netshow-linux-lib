@@ -35,18 +35,8 @@ SUB_INT = 10
 SVI_INT = 11
 VXLAN_INT = 12
 
-
 def portname_list():
-    """
-    :return: list of interface names from /sys/class/net
-    """
-    ifacenames = os.listdir(common.SYS_PATH_ROOT)
-    for ifacename in ifacenames:
-        if not os.path.islink(os.path.join(common.SYS_PATH_ROOT,
-                                           ifacename)):
-            ifacenames.remove(ifacename)
-    return ifacenames
-
+    return common.portname_list()
 
 def iface(name, cache=None):
     """
