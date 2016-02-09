@@ -35,8 +35,10 @@ SUB_INT = 10
 SVI_INT = 11
 VXLAN_INT = 12
 
+
 def portname_list():
     return common.portname_list()
+
 
 def iface(name, cache=None):
     """
@@ -118,6 +120,13 @@ class Iface(object):
         if os.path.exists(os.path.join(self._sys_path_root, self.name)):
             return True
         return False
+
+    def has_stats(self):
+        """
+        :return: return true if iface has stats directory in /sys/class/net
+        """
+        return os.path.exists(os.path.join(
+            'sys', 'class', 'net', self.name, 'statistics'))
 
     def read_symlink(self, attr):
         """

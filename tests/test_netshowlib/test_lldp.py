@@ -10,7 +10,7 @@
 import netshowlib.linux.lldp as linux_lldp
 import xml.etree.ElementTree as ET
 import mock
-from asserts import assert_equals, mod_args_generator
+from asserts import assert_equals
 
 
 @mock.patch('netshowlib.linux.lldp.os.path.exists')

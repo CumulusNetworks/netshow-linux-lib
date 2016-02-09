@@ -3,7 +3,9 @@
 This module collects basic counters from the device
 """
 from netshowlib.linux import common
+from netshowlib.linux import iface
 import os
+
 
 def cacheinfo():
     """
@@ -13,6 +15,7 @@ def cacheinfo():
     """
     pass
 
+
 def gen_method(stat):
     """ generate methods that collect various stats from /sys/class/net
     """
@@ -20,6 +23,7 @@ def gen_method(stat):
         return common.read_from_sys(os.path.join('statistics', stat),
                                     self.name, True)
     return _method
+
 
 class IfaceCounters(object):
     """
@@ -49,7 +53,6 @@ class IfaceCounters(object):
         else:
             self.cache = cacheinfo()
             return self.cache.get(self.name)
-
 
 
 for stat in ['rx_bytes', 'tx_bytes', 'rx_packets', 'tx_packets',

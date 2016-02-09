@@ -12,6 +12,7 @@ Usage:
     netshow l2 [all] [--mac | -m ] [--oneline | -1  | --json | -j | -l | --legend ]
     netshow l3 [all] [--mac | -m ] [--oneline | -1  | --json | -j | -l | --legend ]
     netshow trunks [all] [--mac | -m ] [--oneline | -1  | --json | -j | -l | --legend ]
+    netshow counters [errors] [all]
     netshow (--version | -V)
 
 
@@ -28,6 +29,7 @@ Help:
     lldp                      physical device neighbor information
     interface <iface>         list summary of a single interface
     system                    system information
+    counters                  basic interface counters
 
 
 Options:
@@ -46,6 +48,7 @@ from netshow.netshow import print_version
 from netshow.linux.show_system import ShowSystem
 from netshow.linux.show_interfaces import ShowInterfaces
 from netshow.linux.show_neighbors import ShowNeighbors
+from netshow.linux.show_counters import ShowCounters
 
 
 def interface_related(_nd):
@@ -80,6 +83,9 @@ def run():
         elif _nd.get('lldp'):
             _shownei = ShowNeighbors(_nd)
             print(_shownei.run())
+        elif _nd.get('counters'):
+            _showcounters = ShowCounters(_nd)
+            print(_showcounters.run())
         elif _nd.get('--version') or _nd.get('-V'):
             print(print_version())
         else:
