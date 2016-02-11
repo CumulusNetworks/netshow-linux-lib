@@ -43,3 +43,11 @@ def test_run_show_neighbors(mock_shownei):
     sys.argv = ['netshow', 'lldp']
     show.run()
     assert_equals(mock_shownei.call_count, 1)
+
+
+@mock.patch('netshow.linux.show.ShowCounters')
+def test_run_show_counters(mock_showcount):
+    # netshow counters
+    sys.argv = ['netshow', 'counters']
+    show.run()
+    assert_equals(mock_showcount.call_count, 1)
