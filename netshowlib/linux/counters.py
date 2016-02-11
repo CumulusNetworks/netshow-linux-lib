@@ -13,8 +13,24 @@ def cacheinfo():
     Basic counters are defined in the IfaceCounters class.
     :return: hash of basic interface counters
     """
-    pass
-
+    mapping = {}
+    for ifacename in common.portname_list():
+        _iface = iface.Iface(ifacename)
+        if _iface.has_stats():
+            iface_count = IfaceCounters(_iface.name)
+            mapping[ifacename] = {
+                'rx': {
+                    'packets': iface_count.rx_packets(),
+                    'bytes': iface_count.rx_bytes(),
+                    'errors': iface_count.rx_errors()
+                },
+                'tx': {
+                    'packets': iface_count.tx_packets(),
+                    'bytes': iface_count.tx_bytes(),
+                    'errors': iface_count.tx_errors()
+                }
+            }
+    return mapping
 
 def gen_method(stat):
     """ generate methods that collect various stats from /sys/class/net
