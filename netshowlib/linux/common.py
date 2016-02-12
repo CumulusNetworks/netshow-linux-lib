@@ -22,6 +22,11 @@ class ExecCommandException(Exception):
 SYS_PATH_ROOT = '/sys/class/net'
 
 
+def has_stats(ifacename):
+    return os.path.exists(os.path.join(
+        'sys', 'class', 'net', ifacename, 'statistics'))
+
+
 def portname_list():
     """
     :return: list of interface names from /sys/class/net
@@ -294,6 +299,7 @@ def munge_str(match0):
             else:
                 tvar.append('')
     return tvar
+
 
 def create_sort_tuple(result):
     """

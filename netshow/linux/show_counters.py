@@ -14,7 +14,7 @@ from netshow.linux.common import legend_wrapped_cli_output
 
 class ShowCounters(object):
     """
-    Class responsible for printing out basic linux device neighbor info
+    Class responsible for printing out basic counter information
     """
     def __init__(self, cl):
         self.use_json = cl.get('--json') or cl.get('-j')
@@ -54,19 +54,19 @@ class ShowCounters(object):
         :return: cli output of netshow counters
         """
         _header = ['', _('port'), _('speed'), _('mode'), '',
-                   _('total'), _('errors')]
+                   _('packets'), _('errors')]
         _table = []
         for _piface in self.ifacelist.values():
-            _rx_counters = _piface.iface.counters.get('rx')
-            _tx_counters = _piface.iface.counters.get('tx')
-            _table.append([_piface.linkstate, _piface.name,
-                           _piface.speed, _piface.port_category,
-                           _('rx'), _rx_counters.get('total'),
-                           _rx_counters.get('errors'),
-                           _rx_counters.get('broadcast')])
-            _table.append(['', '', '', '', _('tx'),
-                           _tx_counters.get('total'),
-                           _tx_counters.get('errors')])
+            if _piface.iface.counters:
+                _rx_counters = _piface.iface.counters.get('rx')
+                _tx_counters = _piface.iface.counters.get('tx')
+                _table.append([_piface.linkstate, _piface.name,
+                               _piface.speed, _piface.port_category,
+                               _('rx'), _rx_counters.get('packets'),
+                               _rx_counters.get('errors')])
+                _table.append(['', '', '', '', _('tx'),
+                               _tx_counters.get('packets'),
+                               _tx_counters.get('errors')])
 
         return legend_wrapped_cli_output(tabulate(_table, _header,
                                                   floatfmt='.0f'))

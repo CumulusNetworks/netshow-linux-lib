@@ -25,7 +25,7 @@ class TestLinuxIfaceCounters(object):
         mock_read_oneline.assert_called_with('/sys/class/net/eth1/statistics/rx_bytes')
 
     @mock.patch('netshowlib.linux.common.read_file_oneline')
-    @mock.patch('netshowlib.linux.iface.Iface.has_stats')
+    @mock.patch('netshowlib.linux.common.has_stats')
     @mock.patch('netshowlib.linux.common.portname_list')
     def test_cacheinfo(self, mock_portnamelist, mock_has_stats, mock_read_file):
         values2 = {

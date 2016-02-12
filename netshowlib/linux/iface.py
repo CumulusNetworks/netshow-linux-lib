@@ -14,6 +14,7 @@ import netshowlib.linux.common as common
 import netshowlib.linux.ip_address as ip_address
 import netshowlib.linux.lldp as lldp
 import netshowlib.linux.ip_neighbor as ip_neighbor
+import netshowlib.linux.counters as linux_counters
 import os
 import glob
 import re
@@ -102,6 +103,7 @@ class Iface(object):
         self._ip_addr_assign = 0
         self._cache = cache
         self._lldp = lldp.Lldp(name, cache)
+        self._counters = linux_counters.IfaceCounters(name, cache)
 
 # ----------------------
 # Class methods
@@ -125,6 +127,8 @@ class Iface(object):
         """
         :return: return true if iface has stats directory in /sys/class/net
         """
+        return common.has_stats(self.name)
+
         return os.path.exists(os.path.join(
             'sys', 'class', 'net', self.name, 'statistics'))
 
@@ -437,6 +441,13 @@ class Iface(object):
         else:
             self._linkstate = 0
         return self._linkstate
+
+    @property
+    def counters(self):
+        """
+        get basic counter info
+        """
+        return self._counters.run()
 
     @property
     def lldp(self):
