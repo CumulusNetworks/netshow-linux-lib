@@ -78,6 +78,11 @@ class TestLinuxIface(object):
         self.iface = linux_iface.Iface('eth1')
 
     @mock.patch('netshowlib.linux.iface.os.path.exists')
+    def has_stats(self, mock_path_exists):
+        mock_path_exists.return_value = True
+        assert_equals(self.iface.has_stats(), True)
+
+    @mock.patch('netshowlib.linux.iface.os.path.exists')
     def test_exists(self, mock_path_exists):
         mock_path_exists.return_value = True
         assert_equals(self.iface.exists(), True)

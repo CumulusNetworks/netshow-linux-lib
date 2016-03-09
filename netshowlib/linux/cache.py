@@ -14,6 +14,7 @@ class Cache(object):
     def __init__(self):
         self.feature_list = {'ip_neighbor': 'linux',
                              'lldp': 'linux',
+                             'counters': 'linux',
                              'ip_address': 'linux'}
 
     def run(self, features=None):

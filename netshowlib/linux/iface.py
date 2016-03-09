@@ -14,6 +14,7 @@ import netshowlib.linux.common as common
 import netshowlib.linux.ip_address as ip_address
 import netshowlib.linux.lldp as lldp
 import netshowlib.linux.ip_neighbor as ip_neighbor
+import netshowlib.linux.counters as linux_counters
 import os
 import glob
 import re
@@ -37,15 +38,7 @@ VXLAN_INT = 12
 
 
 def portname_list():
-    """
-    :return: list of interface names from /sys/class/net
-    """
-    ifacenames = os.listdir(common.SYS_PATH_ROOT)
-    for ifacename in ifacenames:
-        if not os.path.islink(os.path.join(common.SYS_PATH_ROOT,
-                                           ifacename)):
-            ifacenames.remove(ifacename)
-    return ifacenames
+    return common.portname_list()
 
 
 def iface(name, cache=None):
@@ -110,6 +103,7 @@ class Iface(object):
         self._ip_addr_assign = 0
         self._cache = cache
         self._lldp = lldp.Lldp(name, cache)
+        self._counters = linux_counters.IfaceCounters(name, cache)
 
 # ----------------------
 # Class methods
@@ -128,6 +122,15 @@ class Iface(object):
         if os.path.exists(os.path.join(self._sys_path_root, self.name)):
             return True
         return False
+
+    def has_stats(self):
+        """
+        :return: return true if iface has stats directory in /sys/class/net
+        """
+        return common.has_stats(self.name)
+
+        return os.path.exists(os.path.join(
+            'sys', 'class', 'net', self.name, 'statistics'))
 
     def read_symlink(self, attr):
         """
@@ -438,6 +441,13 @@ class Iface(object):
         else:
             self._linkstate = 0
         return self._linkstate
+
+    @property
+    def counters(self):
+        """
+        get basic counter info
+        """
+        return self._counters.run()
 
     @property
     def lldp(self):
